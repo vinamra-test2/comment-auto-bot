@@ -1,0 +1,26 @@
+name: Issue Comment Bot
+on:
+  issues:
+    types:
+      - opened
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add issue comment
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const labels = context.payload.issue.labels.map(label => label.name);
+            let commentBody = 'Thank you for your contribution!';
+            if (labels.includes('bug')) {
+              commentBody = 'Thank you. We will fix it';
+            } else if (labels.includes('feature')) {
+              commentBody = 'Thank you, we will consider to include this feature.';
+            }
+            github.issues.createComment({
+              issue_number: context.payload.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: commentBody
+            });
